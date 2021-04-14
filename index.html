@@ -24,6 +24,7 @@
     </form>
   </header>
   <main class="container">
+
     <div id="welcome" class="d-flex justify-content-center">
       <div class="card p-2 text-center w-50">
         <img src="moody-logo.png" height="250" alt="Moody Kittens">
@@ -34,10 +35,11 @@
           <br>
           <button onclick="getStarted()">Get Started</button>
         </div>
+        <button id="cancel" class="btn-cancel mt-1" type="button" onclick="clearKittens()">CLEAR <b id="num"></b> KITTENS</button>
       </div>
     </div>
     <div class="p-2">
-      <div id="kittens" class="d-flex align-items-center flex-wrap">
+      <div id="kittens" class="d-flex align-items-center flex-wrap kitten hidden">
       </div>
   </main>
   <footer class="card bg-dark text-light p-2 d-flex align-items-center justify-content-center">

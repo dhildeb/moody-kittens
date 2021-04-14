@@ -1,88 +1,161 @@
-/**
- * Stores the list of kittens
- * @type {Kitten[]}
- */
-let kittens = [];
-/**
- * Called when submitting the new Kitten Form
- * This method will pull data from the form
- * use the provided function to give the data an id
- * you can use robohash for images
- * https://robohash.org/<INSERTCATNAMEHERE>?set=set4
- * then add that data to the kittens list.
- * Then reset the form
- */
-function addKitten(event) {}
+let kittens = []
+loadKittens()
 
-/**
- * Converts the kittens array to a JSON string then
- * Saves the string to localstorage at the key kittens
- */
-function saveKittens() {}
+function addKitten(event) {
+  event.preventDefault()
 
-/**
- * Attempts to retrieve the kittens string from localstorage
- * then parses the JSON string into an array. Finally sets
- * the kittens array to the retrieved array
- */
-function loadKittens() {}
+  let form = event.target
+  let name = form.name.value
+  let id = generateId()
+  let mood = "tolerant"
+  let affection = 5
 
-/**
- * Draw all of the kittens to the kittens element
- */
-function drawKittens() {}
+let newCat = {id: id,name: name,mood: mood,affection: affection}
 
-/**
- * Find the kitten in the array by its id
- * @param {string} id
- * @return {Kitten}
- */
+let currentCat = kittens.find(kitten => kitten.name == newCat.name)
+
+if(currentCat){
+  alert("You can't have the same cat more than once")}
+else{
+  kittens.push(newCat)
+  saveKittens()
+  
+  console.log(kittens)
+
+  form.reset()
+getStarted()
+}
+}
+
+function saveKittens() {
+  window.localStorage.setItem("kittens", JSON.stringify(kittens))
+  drawKittens()
+}
+function loadKittens() {
+  let KittensData = JSON.parse(window.localStorage.getItem("kittens"))
+
+  if(KittensData){
+    kittens = KittensData
+  }
+  let num = kittens.length
+  document.getElementById("num").innerHTML = num.toString()
+}
+
+function drawKittens() {
+
+  let template = ""
+  
+  kittens.forEach(kitten => {
+
+
+if(kitten.mood == "gone"){
+  template += 
+  `
+  <div class="card bg-dark text-light p-2 m-2 kitten ${kitten.mood}">
+  <img src="https://robohash.org/<${kitten.name}>?set=set4" alt="${kitten.name}.img" class="kitten">
+ <div class="d-flex space-between text-light kitten ${kitten.mood}">
+   <p>
+     <span ><b>Name:</b> 
+     ${kitten.name}
+     </span>
+   </p>
+ </div>
+  <div class="d-flex space-between kitten gone">
+  <span><b>Gone Ran Away</b></span>
+  </div>
+  </div>
+  `
+}
+else{
+  template += 
+  `
+<div class="card bg-dark text-light p-2 m-2 kitten ${kitten.mood}">
+<img src="https://robohash.org/<${kitten.name}>?set=set4" alt="${kitten.name}.img" class="kitten">
+<div class="d-flex space-between text-light kitten ${kitten.mood}">
+ <p>
+   <span ><b>Name:</b> 
+   ${kitten.name}
+   </span>
+ </p>
+</div>
+    <div class="d-flex space-between text-light">
+      <p>
+        <span><b>Mood:</b> 
+        ${kitten.mood}
+        </span>
+      </p>
+    </div>
+    <div class="d-flex space-between text-light">
+      <p>
+        <span><b>Affection:</b> 
+        ${kitten.affection}
+        </span>
+      </p>
+      </div>
+      <div class="d-flex space-between"> 
+      <span><button class="btn-cancel m-3" type="button" onclick="pet('${kitten.id}')">Pet</button>
+      </span>
+      <span class=""><button class="primary-lighten" type="button" onclick="catnip('${kitten.id}')">Catnip</button>
+      </span>
+      </div>
+  </div>
+  `
+}
+});
+document.getElementById("kittens").innerHTML = template
+}
+
 function findKittenById(id) {
   return kittens.find(k => k.id == id);
 }
 
-/**
- * Find the kitten in the array of kittens
- * Generate a random Number
- * if the number is greater than .7
- * increase the kittens affection
- * otherwise decrease the affection
- * save the kittens
- * @param {string} id
- */
-function pet(id) {}
+function pet(id) {
+  let currentKitten = findKittenById(id)
+  
+  if(Math.random()>.7){
+currentKitten.affection++
+  }
+  else{
+    currentKitten.affection--
+  }
+setKittenMood(currentKitten)
+  saveKittens()
+}
 
-/**
- * Find the kitten in the array of kittens
- * Set the kitten's mood to tolerant
- * Set the kitten's affection to 5
- * save the kittens
- * @param {string} id
- */
-function catnip(id) {}
+function catnip(id) {
+  let currentKitten = findKittenById(id)
 
-/**
- * Sets the kittens mood based on its affection
- * Happy > 6, Tolerant <= 5, Angry <= 3, Gone <= 0
- * @param {Kitten} kitten
- */
-function setKittenMood(kitten) {}
+  currentKitten.mood = "tolerant"
+  currentKitten.affection = 5
+
+  saveKittens()
+}
+
+function setKittenMood(kitten) {
+  let km = kitten.affection
+
+  if(km <= 0){
+kitten.mood = "gone"
+  }
+  else if(km <= 3){
+    kitten.mood = "angry"
+  } 
+  else if(km <= 5){
+    kitten.mood = "tolerant"
+  }
+  else if(km > 6){
+    kitten.mood = "happy"
+  }
+  else{
+    console.log("mood error")
+  }
+}
 
 function getStarted() {
   document.getElementById("welcome").remove();
-  drawKittens();
+  document.getElementById("kittens").classList.remove("hidden")
 }
 
-/**
- * Defines the Properties of a Kitten
- * @typedef {{id: string, name: string, mood: string, affection: number}} Kitten
- */
-
-/**
- * Used to generate a random string id for mocked
- * database generated Id
- * @returns {string}
- */
 function generateId() {
   return (
     Math.floor(Math.random() * 10000000) +
@@ -90,3 +163,10 @@ function generateId() {
     Math.floor(Math.random() * 10000000)
   );
 }
+
+function clearKittens(){
+localStorage.removeItem("kittens")
+location.reload()
+}
+
+drawKittens()
